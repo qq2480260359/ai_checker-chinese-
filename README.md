@@ -43,9 +43,9 @@ http://localhost:8000
 
 GitHub Pages only hosts the website files. User text is processed locally in each visitor’s browser and is not uploaded to GitHub.
 
-## 调试分数参数
+## URL 分数参数
 
-可以在 URL 后添加临时调试参数，用于测试或校准最终报告分数：
+可以在 URL 后添加临时参数，用于查看不同最终报告分数的展示效果：
 
 ```text
 ?aiScore=50
@@ -61,7 +61,7 @@ GitHub Pages only hosts the website files. User text is processed locally in eac
 - `mechanicalScore`
 - `overallScore`
 
-这些参数只用于临时测试/校准，不会改变真实算法，不会保存任何内容，也只影响打开该精确链接的当前访问者。删除 URL 参数后，网站会恢复正常评分。
+这些参数不会改变真实算法，不会保存任何内容，也只影响打开该精确链接的当前访问者。删除 URL 参数后，网站会恢复正常评分。
 
 ## 重要声明
 

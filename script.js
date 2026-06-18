@@ -292,7 +292,6 @@ function applyScoreOverrides(analysis) {
   const overrides = getScoreOverridesFromUrl();
 
   if (!overrides.hasOverrides) {
-    analysis.debugOverridesEnabled = false;
     return analysis;
   }
 
@@ -330,8 +329,6 @@ function applyScoreOverrides(analysis) {
           100
         );
   analysis.overallLevel = getRiskLevel(analysis.overallScore);
-  analysis.debugOverridesEnabled = true;
-  analysis.scoreOverrides = overrides;
 
   return analysis;
 }
@@ -681,12 +678,6 @@ function renderReport(analysis) {
       </div>
     </div>
 
-    ${
-      analysis.debugOverridesEnabled
-        ? `<p class="debug-notice">调试分数已启用：当前报告包含 URL 指定的测试分数。</p>`
-        : ""
-    }
-
     <div class="metric-grid">
       ${metrics.map(renderMetricCard).join("")}
     </div>
@@ -881,9 +872,6 @@ function buildPlainTextReport(analysis) {
     `检测时间：${analysis.displayTime}`,
     `文本字数：${analysis.stats.words} 字`,
     `总体风险等级：${analysis.overallLevel.label}（${analysis.overallScore}/100）`,
-    ...(analysis.debugOverridesEnabled
-      ? ["调试分数已启用：当前报告包含 URL 指定的测试分数。"]
-      : []),
     "",
     `AI疑似率：${analysis.ai.score}/100（${analysis.ai.level.label}）`,
     `说明：${analysis.ai.explanation}`,
