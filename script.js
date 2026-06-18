@@ -712,11 +712,6 @@ function renderReport(analysis) {
       ${renderSentenceFindings(analysis.repetition)}
     </div>
 
-    <p class="report-note">
-      本工具为本地预检工具，结果仅供参考，不等同于学校、知网、维普、万方、Turnitin等官方检测结果。
-      所有文本仅在你的浏览器本地分析，不会上传服务器。
-    </p>
-
     <p class="copy-status no-print" id="copyStatus" aria-live="polite"></p>
     <div class="manual-copy no-print hidden" id="manualCopyArea">
       <label for="manualCopyText">手动复制报告文本</label>
@@ -905,9 +900,7 @@ function buildPlainTextReport(analysis) {
           .slice(0, 6)
           .map((item) => `- ${item.phrase}（出现 ${item.count} 次）`)
       : ["- 未发现明显高频重复短语。"]),
-    "",
-    "免责声明：本工具为本地预检工具，结果仅供参考，不等同于学校、知网、维普、万方、Turnitin等官方检测结果。",
-    "隐私说明：所有文本仅在你的浏览器本地分析，不会上传服务器。"
+    ""
   ];
 
   return lines.join("\n");
