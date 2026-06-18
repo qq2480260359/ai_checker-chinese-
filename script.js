@@ -239,7 +239,7 @@ function analyzeText(text) {
     100
   );
 
-  return {
+  const analysis = {
     generatedAt: new Date().toISOString(),
     displayTime: formatDateTime(new Date()),
     stats,
@@ -259,6 +259,90 @@ function analyzeText(text) {
       highRiskParagraphs
     })
   };
+
+  return applyScoreOverrides(analysis);
+}
+
+function getScoreOverridesFromUrl() {
+  const overrides = {
+    aiScore: null,
+    plagiarismScore: null,
+    repetitionScore: null,
+    mechanicalScore: null,
+    overallScore: null,
+    hasOverrides: false
+  };
+  const search = typeof window === "undefined" ? "" : window.location.search;
+  const params = new URLSearchParams(search);
+
+  ["aiScore", "plagiarismScore", "repetitionScore", "mechanicalScore", "overallScore"].forEach(
+    (key) => {
+      if (!params.has(key)) return;
+      const score = parseScoreOverride(params.get(key));
+      if (score === null) return;
+      overrides[key] = score;
+      overrides.hasOverrides = true;
+    }
+  );
+
+  return overrides;
+}
+
+function applyScoreOverrides(analysis) {
+  const overrides = getScoreOverridesFromUrl();
+
+  if (!overrides.hasOverrides) {
+    analysis.debugOverridesEnabled = false;
+    return analysis;
+  }
+
+  if (overrides.aiScore !== null) {
+    analysis.ai.score = overrides.aiScore;
+    analysis.ai.level = getRiskLevel(overrides.aiScore);
+  }
+
+  if (overrides.plagiarismScore !== null) {
+    analysis.plagiarism.score = overrides.plagiarismScore;
+    analysis.plagiarism.level = getRiskLevel(overrides.plagiarismScore);
+  }
+
+  if (overrides.repetitionScore !== null) {
+    analysis.repetition.percentage = overrides.repetitionScore;
+    analysis.repetition.level = getRiskLevel(overrides.repetitionScore);
+  }
+
+  if (overrides.mechanicalScore !== null) {
+    analysis.mechanical.score = overrides.mechanicalScore;
+    analysis.mechanical.level = getRiskLevel(overrides.mechanicalScore);
+  }
+
+  analysis.overallScore =
+    overrides.overallScore !== null
+      ? overrides.overallScore
+      : clamp(
+          Math.round(
+            analysis.ai.score * 0.32 +
+              analysis.plagiarism.score * 0.29 +
+              analysis.repetition.percentage * 0.17 +
+              analysis.mechanical.score * 0.22
+          ),
+          0,
+          100
+        );
+  analysis.overallLevel = getRiskLevel(analysis.overallScore);
+  analysis.debugOverridesEnabled = true;
+  analysis.scoreOverrides = overrides;
+
+  return analysis;
+}
+
+function parseScoreOverride(value) {
+  if (value === null) return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const score = Number(trimmed);
+  if (!Number.isFinite(score)) return null;
+  return clamp(Math.round(score), 0, 100);
 }
 
 function calculateAIRisk(text, sentences, paragraphs) {
@@ -539,6 +623,7 @@ function renderReport(analysis) {
     {
       title: "AI疑似率",
       score: analysis.ai.score,
+      //score: 12,
       level: analysis.ai.level,
       explanation: analysis.ai.explanation
     },
@@ -592,9 +677,15 @@ function renderReport(analysis) {
       </div>
       <div class="meta-item">
         <span>总体风险等级</span>
-        <strong><span class="risk-pill risk-${analysis.overallLevel.key}">${analysis.overallLevel.label}</span></strong>
+        <strong><span class="risk-pill risk-${analysis.overallLevel.key}">${analysis.overallLevel.label} · ${analysis.overallScore}/100</span></strong>
       </div>
     </div>
+
+    ${
+      analysis.debugOverridesEnabled
+        ? `<p class="debug-notice">调试分数已启用：当前报告包含 URL 指定的测试分数。</p>`
+        : ""
+    }
 
     <div class="metric-grid">
       ${metrics.map(renderMetricCard).join("")}
@@ -790,6 +881,9 @@ function buildPlainTextReport(analysis) {
     `检测时间：${analysis.displayTime}`,
     `文本字数：${analysis.stats.words} 字`,
     `总体风险等级：${analysis.overallLevel.label}（${analysis.overallScore}/100）`,
+    ...(analysis.debugOverridesEnabled
+      ? ["调试分数已启用：当前报告包含 URL 指定的测试分数。"]
+      : []),
     "",
     `AI疑似率：${analysis.ai.score}/100（${analysis.ai.level.label}）`,
     `说明：${analysis.ai.explanation}`,

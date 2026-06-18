@@ -43,6 +43,26 @@ http://localhost:8000
 
 GitHub Pages only hosts the website files. User text is processed locally in each visitor’s browser and is not uploaded to GitHub.
 
+## 调试分数参数
+
+可以在 URL 后添加临时调试参数，用于测试或校准最终报告分数：
+
+```text
+?aiScore=50
+?aiScore=50&plagiarismScore=40
+?aiScore=50&plagiarismScore=40&repetitionScore=12&mechanicalScore=37
+```
+
+支持的参数：
+
+- `aiScore`
+- `plagiarismScore`
+- `repetitionScore`
+- `mechanicalScore`
+- `overallScore`
+
+这些参数只用于临时测试/校准，不会改变真实算法，不会保存任何内容，也只影响打开该精确链接的当前访问者。删除 URL 参数后，网站会恢复正常评分。
+
 ## 重要声明
 
 本工具为本地预检工具，结果仅供写作修改参考。
