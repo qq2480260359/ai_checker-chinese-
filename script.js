@@ -430,8 +430,7 @@ function calculatePlagiarismRisk(text, sentences, paragraphs, repetition, ai) {
     score,
     level: getRiskLevel(score),
     flags,
-    explanation:
-      "本项主要依据文本内部重复、模板化表达和相似句式进行预估，不代表数据库查重结果。"
+    explanation: "本项用于预估文章内容的相似重复风险。"
   };
 }
 
@@ -715,6 +714,7 @@ function renderReport(analysis) {
 
     <p class="report-note">
       本工具为本地预检工具，结果仅供参考，不等同于学校、知网、维普、万方、Turnitin等官方检测结果。
+      当前版本未接入知网、维普、万方、Turnitin等大型数据库，结果仅供修改参考，不代表官方查重结果。
       所有文本仅在你的浏览器本地分析，不会上传服务器。
     </p>
 
@@ -908,6 +908,7 @@ function buildPlainTextReport(analysis) {
       : ["- 未发现明显高频重复短语。"]),
     "",
     "免责声明：本工具为本地预检工具，结果仅供参考，不等同于学校、知网、维普、万方、Turnitin等官方检测结果。",
+    "查重说明：当前版本未接入知网、维普、万方、Turnitin等大型数据库，结果仅供修改参考，不代表官方查重结果。",
     "隐私说明：所有文本仅在你的浏览器本地分析，不会上传服务器。"
   ];
 
